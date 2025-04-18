@@ -11,7 +11,7 @@ class App extends StatelessWidget {
     return BlocProvider<FileManagerBloc>(
       create: (context) => FileManagerBloc()
         ..add(
-          GetFilesEvent(20),
+          GetFilesEvent(40),
         ),
       child: Scaffold(
         body: SafeArea(

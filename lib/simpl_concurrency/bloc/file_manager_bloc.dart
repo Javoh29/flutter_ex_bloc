@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_ex_bloc/simpl_concurrency/models/file_model.dart';
@@ -10,11 +11,12 @@ part 'file_manager_event.dart';
 part 'file_manager_state.dart';
 
 class FileManagerBloc extends Bloc<FileManagerEvent, FileManagerState> {
+  List<FileModel> files = [];
   FileManagerBloc() : super(FileManagerInitial()) {
     on<GetFilesEvent>(_getFiles);
     on<SendFileEvent>(
       _sendFile,
-      transformer: sequentialLimit(2),
+      transformer: sequentialLimit(4),
     );
   }
 
@@ -22,7 +24,6 @@ class FileManagerBloc extends Bloc<FileManagerEvent, FileManagerState> {
     SendFileEvent event,
     Emitter<FileManagerState> emit,
   ) async {
-    var files = state.files.toList();
     files.add(
       event.model.copyWith(
         status: Statuses.loading,
@@ -30,7 +31,7 @@ class FileManagerBloc extends Bloc<FileManagerEvent, FileManagerState> {
     );
     emit(FileManagerLoading(files: files));
     try {
-      await Future.delayed(const Duration(seconds: 4));
+      await Future.delayed(const Duration(seconds: 3));
       files = files.map(
         (e) {
           if (e.id == event.model.id) {
